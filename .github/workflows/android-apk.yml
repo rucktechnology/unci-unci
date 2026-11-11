@@ -1,0 +1,85 @@
+# Costruisce l'APK firmato e lo pubblica come GitHub Release.
+#
+# Perché l'APK si installa "in aggiornamento" sopra quello precedente:
+#   1. stesso package name (android.package in app.json);
+#   2. sempre firmato con la STESSA chiave: la cartella keystore/ è nel repository
+#      (chiave + certificato, come il debug.keystore di CircleLauncher), quindi nessun secret da configurare;
+#   3. versionCode che cresce a ogni build (numero della run di GitHub).
+#
+# NON cancellare né rigenerare i file in keystore/: cambiando chiave Android
+# rifiuta l'aggiornamento e bisogna disinstallare l'app (perdendo i dati).
+#
+# Download: pagina "Releases" del repository, link fisso all'ultima versione:
+#   https://github.com/<utente>/<repo>/releases/latest/download/unci-unci.apk
+
+name: Build APK Android
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write # serve per creare la Release
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: npm ci
+
+      - name: Imposta versionCode crescente
+        run: |
+          node -e '
+            const fs = require("fs");
+            const app = JSON.parse(fs.readFileSync("app.json", "utf8"));
+            app.expo.android.versionCode = Number(process.env.GITHUB_RUN_NUMBER);
+            fs.writeFileSync("app.json", JSON.stringify(app, null, 2));
+          '
+          grep -n versionCode app.json
+
+      - name: Genera il progetto Android nativo
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Compila l'APK release
+        working-directory: android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a,armeabi-v7a --no-daemon
+
+      - name: Firma l'APK con la chiave del progetto
+        run: |
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          SRC=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          "$BT/apksigner" sign \
+            --key keystore/unci-unci.key.pk8 \
+            --cert keystore/unci-unci.cert.pem \
+            --out unci-unci.apk "$SRC"
+          "$BT/apksigner" verify --print-certs unci-unci.apk
+
+      - name: Pubblica la Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${GITHUB_RUN_NUMBER}" unci-unci.apk \
+            --title "Unci Unci build ${GITHUB_RUN_NUMBER}" \
+            --notes "Commit ${GITHUB_SHA::7}. Installa l'APK sopra la versione precedente per aggiornare." \
+            --latest
