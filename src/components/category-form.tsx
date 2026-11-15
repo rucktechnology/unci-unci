@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Category, createCategory } from '@/db';
-import { colors, fonts, minTouchSize, radii, spacing } from '@/theme';
+import { colors, fontSizes, fonts, layout, radii } from '@/theme';
 
 export function CategoryForm({ onCreated }: { onCreated: (c: Category) => void }) {
   const [nome, setNome] = useState('');
@@ -17,7 +17,7 @@ export function CategoryForm({ onCreated }: { onCreated: (c: Category) => void }
   };
 
   return (
-    <View>
+    <View style={styles.wrap}>
       <TextInput
         value={nome}
         onChangeText={setNome}
@@ -52,33 +52,34 @@ export function CategoryForm({ onCreated }: { onCreated: (c: Category) => void }
 }
 
 const styles = StyleSheet.create({
+  wrap: { gap: 14 },
   input: {
-    minHeight: minTouchSize + 8,
-    borderRadius: radii.pill,
-    backgroundColor: colors.chip,
-    paddingHorizontal: spacing.lg - 4,
+    height: layout.chipHeight,
+    borderRadius: radii.chip,
+    backgroundColor: colors.background,
+    paddingHorizontal: 16,
     fontFamily: fonts.body,
-    fontSize: 17,
+    fontSize: fontSizes.large,
     color: colors.ink,
   },
-  swatches: { flexDirection: 'row', gap: spacing.sm + 4, marginVertical: spacing.md },
+  swatches: { flexDirection: 'row', gap: layout.chipGap },
   swatchOuter: {
-    width: minTouchSize,
-    height: minTouchSize,
-    borderRadius: minTouchSize / 2,
-    borderWidth: 3,
+    width: layout.chipHeight,
+    height: layout.chipHeight,
+    borderRadius: radii.chip,
+    borderWidth: 2,
     borderColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  swatch: { width: 28, height: 28, borderRadius: 14 },
+  swatch: { width: 26, height: 26, borderRadius: 13 },
   addBtn: {
-    minHeight: minTouchSize + 8,
-    borderRadius: radii.pill,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   addBtnDisabled: { opacity: 0.4 },
-  addText: { fontFamily: fonts.bodySemiBold, fontSize: 17, color: colors.onPrimary },
+  addText: { fontFamily: fonts.heading, fontSize: fontSizes.large, color: colors.onPrimary },
 });

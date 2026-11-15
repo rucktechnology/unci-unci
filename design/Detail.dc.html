@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Unci Unci – Dettaglio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.t{font-family:Cabin,'Gill Sans',sans-serif}
+button{font-family:Cabin,'Gill Sans',sans-serif;border:0;cursor:pointer}
+.tb{width:100%;border-collapse:collapse}
+.tb th{text-align:left;font-size:12px;font-weight:600;color:#5F6368;padding:10px 14px}
+.tb td{padding:0 14px;height:48px;font-size:14px;border-top:1px solid #EDEAE4}
+.tb .r{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;padding:56px 20px 0;background:#F0EEE9;color:#1F2A33;font-family:Cabin,'Gill Sans',sans-serif;display:flex;flex-direction:column;gap:18px;overflow:hidden">
+<div><div style="font-size:13px;color:#5F6368;font-weight:500">Novembre 2026 · 27 spese</div><h1 class="t" style="margin:0;font-size:30px">Dettaglio</h1></div>
+<div style="display:flex;gap:8px">
+<button style="height:44px;padding:0 16px;border-radius:22px;background:#E4E1DA;color:#1F2A33;font-size:14px;font-weight:600">7 giorni</button>
+<button style="height:44px;padding:0 16px;border-radius:22px;background:#1F2A33;color:#fff;font-size:14px;font-weight:600">Mese</button>
+<button style="height:44px;padding:0 16px;border-radius:22px;background:#E4E1DA;color:#1F2A33;font-size:14px;font-weight:600">Anno</button>
+<button style="height:44px;padding:0 16px;border-radius:22px;background:#E4E1DA;color:#1F2A33;font-size:14px;font-weight:600">Intervallo</button>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button aria-pressed="true" style="height:44px;padding:0 14px;border-radius:22px;background:#fff;box-shadow:inset 0 0 0 2px #5B83A6;color:#1F2A33;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:5px;background:#5B83A6"></span>Spesa</button>
+<button aria-pressed="true" style="height:44px;padding:0 14px;border-radius:22px;background:#fff;box-shadow:inset 0 0 0 2px #C98B52;color:#1F2A33;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:5px;background:#C98B52"></span>Hotel</button>
+<button aria-pressed="true" style="height:44px;padding:0 14px;border-radius:22px;background:#fff;box-shadow:inset 0 0 0 2px #1F2A33;color:#1F2A33;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:5px;background:#1F2A33"></span>Benzina</button>
+<button aria-pressed="true" style="height:44px;padding:0 14px;border-radius:22px;background:#fff;box-shadow:inset 0 0 0 2px #8FA38C;color:#1F2A33;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:5px;background:#8FA38C"></span>Birra</button>
+</div><div style="background:#fff;border-radius:20px;overflow:hidden"><table class="tb"><thead><tr><th>Data ↓</th><th>Categoria</th><th class="r">Importo</th></tr></thead><tbody>
+<tr><td>11 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#5B83A6;margin-right:8px"></span>Spesa</td><td class="r">€ 42,30</td></tr>
+<tr><td>11 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#8FA38C;margin-right:8px"></span>Birra</td><td class="r">€ 12,00</td></tr>
+<tr><td>10 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#1F2A33;margin-right:8px"></span>Benzina</td><td class="r">€ 50,00</td></tr>
+<tr><td>08 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#5B83A6;margin-right:8px"></span>Spesa</td><td class="r">€ 65,80</td></tr>
+<tr><td>07 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#C98B52;margin-right:8px"></span>Hotel</td><td class="r">€ 150,00</td></tr>
+<tr><td>07 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#8FA38C;margin-right:8px"></span>Birra</td><td class="r">€ 9,50</td></tr>
+<tr><td>05 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#1F2A33;margin-right:8px"></span>Benzina</td><td class="r">€ 45,00</td></tr>
+<tr><td>03 nov</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:5px;background:#5B83A6;margin-right:8px"></span>Spesa</td><td class="r">€ 28,40</td></tr>
+</tbody></table></div>
+<nav style="position:absolute;left:0;right:0;bottom:0;height:84px;box-sizing:border-box;padding-top:10px;display:flex;justify-content:space-around;align-items:flex-start;background:#fff;border-top:1px solid #E4E1DA">
+<button style="background:none;min-width:80px;min-height:44px;font-size:13px;font-weight:600;color:#6B6F72">Riepilogo</button>
+<button style="background:none;min-width:80px;min-height:44px;font-size:13px;font-weight:600;color:#1F2A33">Dettaglio</button>
+<button style="background:none;min-width:80px;min-height:44px;font-size:13px;font-weight:600;color:#6B6F72">Grafici</button>
+<button style="background:none;min-width:80px;min-height:44px;font-size:13px;font-weight:600;color:#6B6F72">Impostazioni</button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

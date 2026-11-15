@@ -3,7 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { PeriodState } from '@/hooks/use-period';
 import { PeriodKind, formatShortDate, fromISODate, toISODate } from '@/lib/period';
-import { colors, fonts, minTouchSize, radii, spacing } from '@/theme';
+import { colors, fontSizes, fonts, layout, radii } from '@/theme';
 
 const PERIODS: { kind: PeriodKind; label: string }[] = [
   { kind: '7d', label: '7 giorni' },
@@ -30,7 +30,7 @@ export function PeriodPicker({ kind, setKind, custom, setCustom }: PeriodState) 
     });
 
   return (
-    <View>
+    <View style={styles.wrap}>
       <View style={styles.chips}>
         {PERIODS.map((p) => {
           const active = p.kind === kind;
@@ -76,26 +76,27 @@ export function PeriodPicker({ kind, setKind, custom, setCustom }: PeriodState) 
 }
 
 const styles = StyleSheet.create({
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm + 4, marginTop: spacing.md },
+  wrap: { gap: layout.chipGap },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: layout.chipGap },
   chip: {
-    minHeight: minTouchSize,
-    paddingHorizontal: spacing.lg - 4,
-    borderRadius: radii.pill,
+    height: layout.chipHeight,
+    paddingHorizontal: 16,
+    borderRadius: radii.chip,
     backgroundColor: colors.chip,
     justifyContent: 'center',
   },
-  chipActive: { backgroundColor: colors.ink },
-  chipText: { fontFamily: fonts.bodySemiBold, fontSize: 17, color: colors.ink },
+  chipActive: { backgroundColor: colors.primary },
+  chipText: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.body, color: colors.ink },
   chipTextActive: { color: colors.onPrimary },
-  rangeRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.md },
-  rangeItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  rangeLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: colors.inkMuted },
+  rangeRow: { flexDirection: 'row', gap: 16 },
+  rangeItem: { flexDirection: 'row', alignItems: 'center', gap: layout.chipGap },
+  rangeLabel: { fontFamily: fonts.bodyMedium, fontSize: fontSizes.body, color: colors.inkMuted },
   rangeBtn: {
-    minHeight: minTouchSize,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.pill,
+    height: layout.chipHeight,
+    paddingHorizontal: 16,
+    borderRadius: radii.chip,
     backgroundColor: colors.chip,
     justifyContent: 'center',
   },
-  rangeBtnText: { fontFamily: fonts.bodySemiBold, fontSize: 16, color: colors.ink },
+  rangeBtnText: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.body, color: colors.ink },
 });

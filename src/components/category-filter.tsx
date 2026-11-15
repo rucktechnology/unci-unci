@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Category } from '@/db';
-import { colors, fonts, minTouchSize, radii, spacing } from '@/theme';
+import { colors, fontSizes, fonts, layout, radii } from '@/theme';
 
 type Props = {
   categories: Category[];
@@ -21,15 +21,8 @@ export function CategoryFilter({ categories, excluded, onToggle }: Props) {
             onPress={() => onToggle(c.id)}
             accessibilityRole="button"
             accessibilityState={{ selected: on }}
-            style={[styles.filter, { borderColor: on ? c.colore : colors.border }]}>
-            <View
-              style={[
-                styles.dot,
-                on
-                  ? { backgroundColor: c.colore }
-                  : { borderWidth: 2.5, borderColor: colors.inactive },
-              ]}
-            />
+            style={[styles.filter, on ? { borderColor: c.colore } : styles.filterOff]}>
+            <View style={[styles.dot, on ? { backgroundColor: c.colore } : styles.dotOff]} />
             <Text style={[styles.filterText, !on && styles.filterTextOff]}>{c.nome}</Text>
           </Pressable>
         );
@@ -39,18 +32,24 @@ export function CategoryFilter({ categories, excluded, onToggle }: Props) {
 }
 
 const styles = StyleSheet.create({
-  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm + 4, marginTop: spacing.md },
+  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: layout.chipGap },
   filter: {
-    minHeight: minTouchSize,
+    height: layout.chipHeight,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md + 4,
-    borderRadius: radii.pill,
-    borderWidth: 2.5,
-    backgroundColor: colors.background,
+    gap: 8,
+    paddingHorizontal: 14,
+    borderRadius: radii.chip,
+    borderWidth: 2,
+    backgroundColor: colors.card,
   },
-  filterText: { fontFamily: fonts.bodySemiBold, fontSize: 17, color: colors.ink },
-  filterTextOff: { color: colors.inactive },
-  dot: { width: 14, height: 14, borderRadius: 7 },
+  filterOff: {
+    borderWidth: 1.5,
+    borderColor: colors.outline,
+    backgroundColor: 'transparent',
+  },
+  filterText: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.body, color: colors.ink },
+  filterTextOff: { color: colors.inkMuted },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  dotOff: { borderWidth: 2, borderColor: colors.outlineDot },
 });

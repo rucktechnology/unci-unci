@@ -7,6 +7,11 @@ export function formatEuro(cents: number): string {
   return `€ ${groupThousands(String(euros))},${rest}`;
 }
 
+/** Come formatEuro, ma senza ",00" per gli importi interi: "€ 842" / "€ 842,50". */
+export function formatEuroCompact(cents: number): string {
+  return cents % 100 === 0 ? `€ ${groupThousands(String(cents / 100))}` : formatEuro(cents);
+}
+
 export function groupThousands(intPart: string): string {
   return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }

@@ -1,10 +1,8 @@
-import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   Alert,
   Linking,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -20,6 +18,7 @@ import {
   getCategories,
 } from '@/db';
 import { CategoryForm } from '@/components/category-form';
+import { TimePill } from '@/components/time-pill';
 import {
   DEFAULT_TIME,
   PermissionState,
@@ -29,7 +28,7 @@ import {
   setReminderEnabled,
   setReminderTime,
 } from '@/notifications/reminder';
-import { colors, fonts, minTouchSize, radii, spacing } from '@/theme';
+import { colors, fontSizes, fonts, layout, radii } from '@/theme';
 
 export default function Impostazioni() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -48,18 +47,6 @@ export default function Impostazioni() {
     setReminder(res.settings);
     setPermission(res.permission);
   };
-
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const timeLabel = `${pad(reminder.hour)}:${pad(reminder.minute)}`;
-  const timeValue = new Date(2000, 0, 1, reminder.hour, reminder.minute);
-
-  const openAndroidTimePicker = () =>
-    DateTimePickerAndroid.open({
-      value: timeValue,
-      mode: 'time',
-      is24Hour: true,
-      onValueChange: (_e, d) => applyReminder(setReminderTime(d.getHours(), d.getMinutes())),
-    });
 
   useFocusEffect(
     useCallback(() => {
@@ -87,11 +74,7 @@ export default function Impostazioni() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{
-        paddingTop: spacing.sm,
-        paddingHorizontal: spacing.lg - 4,
-        paddingBottom: spacing.xl,
-      }}
+      contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled">
       <Text style={styles.section}>Promemoria giornaliero</Text>
       <View style={styles.card}>
@@ -113,23 +96,11 @@ export default function Impostazioni() {
         {reminder.enabled && (
           <View style={styles.timeRow}>
             <Text style={styles.rowText}>Ora</Text>
-            {Platform.OS === 'android' ? (
-              <Pressable
-                onPress={openAndroidTimePicker}
-                accessibilityRole="button"
-                style={styles.timePill}>
-                <Text style={styles.timeText}>{timeLabel}</Text>
-              </Pressable>
-            ) : (
-              <DateTimePicker
-                value={timeValue}
-                mode="time"
-                display="compact"
-                onValueChange={(_e, d) =>
-                  applyReminder(setReminderTime(d.getHours(), d.getMinutes()))
-                }
-              />
-            )}
+            <TimePill
+              hour={reminder.hour}
+              minute={reminder.minute}
+              onChange={(h, m) => applyReminder(setReminderTime(h, m))}
+            />
           </View>
         )}
 
@@ -180,61 +151,58 @@ export default function Impostazioni() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
+  content: {
+    paddingTop: 8,
+    paddingHorizontal: layout.screenPaddingX,
+    paddingBottom: 40,
+    gap: layout.blockGap,
+  },
   section: {
-    fontFamily: fonts.headingMedium,
-    fontSize: 20,
+    fontFamily: fonts.heading,
+    fontSize: fontSizes.label,
     color: colors.ink,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
+    marginBottom: -6,
   },
   card: {
     backgroundColor: colors.card,
     borderRadius: radii.card,
-    padding: spacing.md,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
   },
-  empty: { fontFamily: fonts.body, fontSize: 16, color: colors.inkMuted },
+  empty: { fontFamily: fonts.body, fontSize: fontSizes.caption, color: colors.inkMuted },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: minTouchSize + 8,
-    gap: spacing.sm + 4,
+    minHeight: 52,
+    gap: 12,
   },
-  rowBorder: { borderTopWidth: 1, borderTopColor: colors.border },
-  dot: { width: 16, height: 16, borderRadius: 8 },
-  rowText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 17, color: colors.ink },
-  reminderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  rowBorder: { borderTopWidth: 1, borderTopColor: colors.rowDivider },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  rowText: { flex: 1, fontFamily: fonts.bodySemiBold, fontSize: fontSizes.label, color: colors.ink },
+  reminderRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   reminderText: { flex: 1 },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: minTouchSize + 8,
-    marginTop: spacing.sm,
+    minHeight: 52,
+    marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: colors.rowDivider,
   },
-  timePill: {
-    minHeight: minTouchSize,
-    paddingHorizontal: spacing.lg - 4,
-    borderRadius: radii.pill,
-    backgroundColor: colors.chip,
-    justifyContent: 'center',
-  },
-  timeText: { fontFamily: fonts.heading, fontSize: 20, color: colors.ink },
-  warning: { marginTop: spacing.sm, gap: spacing.sm },
+  warning: { marginTop: 8, gap: 8 },
   settingsBtn: {
-    minHeight: minTouchSize,
-    borderRadius: radii.pill,
+    height: layout.chipHeight,
+    borderRadius: radii.chip,
     backgroundColor: colors.chip,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  settingsBtnText: { fontFamily: fonts.bodySemiBold, fontSize: 16, color: colors.ink },
+  settingsBtnText: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.body, color: colors.ink },
   deleteBtn: {
-    minHeight: minTouchSize,
-    paddingHorizontal: spacing.md,
+    height: layout.chipHeight,
+    paddingHorizontal: 12,
     justifyContent: 'center',
-    borderRadius: radii.pill,
   },
-  deleteText: { fontFamily: fonts.bodySemiBold, fontSize: 15, color: colors.danger },
+  deleteText: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.body, color: colors.danger },
 });

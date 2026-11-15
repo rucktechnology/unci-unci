@@ -1,13 +1,10 @@
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-} from '@expo-google-fonts/inter';
-import {
-  SpaceGrotesk_500Medium,
-  SpaceGrotesk_700Bold,
+  Cabin_400Regular,
+  Cabin_500Medium,
+  Cabin_600SemiBold,
+  Cabin_700Bold,
   useFonts,
-} from '@expo-google-fonts/space-grotesk';
+} from '@expo-google-fonts/cabin';
 import * as Notifications from 'expo-notifications';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -15,17 +12,16 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 
 import { REMINDER_URL, syncReminder } from '@/notifications/reminder';
-import { colors, fonts } from '@/theme';
+import { colors, fontSizes, fonts } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceGrotesk_500Medium,
-    SpaceGrotesk_700Bold,
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
+    Cabin_400Regular,
+    Cabin_500Medium,
+    Cabin_600SemiBold,
+    Cabin_700Bold,
   });
 
   useEffect(() => {
@@ -70,7 +66,7 @@ export default function RootLayout() {
             headerShadowVisible: false,
             headerTintColor: colors.ink,
             headerStyle: { backgroundColor: colors.background },
-            headerTitleStyle: { fontFamily: fonts.heading, fontSize: 20 },
+            headerTitleStyle: { fontFamily: fonts.heading, fontSize: fontSizes.stat },
           }}
         />
       </Stack>

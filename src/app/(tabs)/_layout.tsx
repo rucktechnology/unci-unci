@@ -1,24 +1,25 @@
 import { Tabs } from 'expo-router';
-import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { SettingsButton } from '@/components/settings-button';
-
-import { colors, fonts } from '@/theme';
+import { colors, fontSizes, fonts, layout } from '@/theme';
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: colors.background },
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: colors.ink,
         tabBarInactiveTintColor: colors.inactive,
         tabBarIconStyle: { display: 'none' },
-        tabBarLabelStyle: { fontFamily: fonts.bodySemiBold, fontSize: 14 },
+        tabBarLabelStyle: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.caption },
         tabBarLabelPosition: 'beside-icon',
-        tabBarItemStyle: { justifyContent: 'center', minHeight: 44 },
+        tabBarItemStyle: { justifyContent: 'center', height: layout.chipHeight },
         tabBarStyle: {
+          height: layout.tabBarContentHeight + insets.bottom,
+          paddingTop: 10,
+          paddingBottom: insets.bottom,
           backgroundColor: colors.card,
           borderTopColor: colors.border,
           borderTopWidth: 1,
@@ -28,7 +29,5 @@ export default function TabsLayout() {
       <Tabs.Screen name="dettaglio" options={{ title: 'Dettaglio' }} />
       <Tabs.Screen name="grafici" options={{ title: 'Grafici' }} />
     </Tabs>
-    <SettingsButton />
-    </View>
   );
 }

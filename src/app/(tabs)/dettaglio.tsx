@@ -4,12 +4,16 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CategoryFilter } from '@/components/category-filter';
+import { NoteModal } from '@/components/note-modal';
 import { PeriodPicker } from '@/components/period-picker';
+import { ScreenHeader } from '@/components/screen-header';
 import { Category, Expense, getCategories, getExpenses } from '@/db';
 import { usePeriod } from '@/hooks/use-period';
 import { formatEuro } from '@/lib/money';
 import { formatShortDate, periodTitle } from '@/lib/period';
-import { colors, fonts, minTouchSize, radii, spacing } from '@/theme';
+import { colors, fontSizes, fonts, layout, radii } from '@/theme';
+
+const ROW_HEIGHT = 48;
 
 export default function Dettaglio() {
   const insets = useSafeAreaInsets();
@@ -19,11 +23,7 @@ export default function Dettaglio() {
   const [excluded, setExcluded] = useState<number[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [newestFirst, setNewestFirst] = useState(true);
-
-  const categoryIds = useMemo(
-    () => categories.filter((c) => !excluded.includes(c.id)).map((c) => c.id),
-    [categories, excluded],
-  );
+  const [noteFor, setNoteFor] = useState<Expense | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -53,18 +53,18 @@ export default function Dettaglio() {
   const toggle = (id: number) =>
     setExcluded((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
+  const allExcluded = categories.length > 0 && excluded.length >= categories.length;
+
   const header = (
-    <View>
-      <Text style={styles.subtitle}>
-        {periodTitle(kind, range)} · {expenses.length} {expenses.length === 1 ? 'spesa' : 'spese'}
-      </Text>
-      <Text style={styles.title}>Dettaglio</Text>
-
+    <View style={styles.header}>
+      <ScreenHeader
+        subtitle={`${periodTitle(kind, range)} · ${expenses.length} ${expenses.length === 1 ? 'spesa' : 'spese'}`}
+        title="Dettaglio"
+      />
       <PeriodPicker {...period} />
-
       <CategoryFilter categories={categories} excluded={excluded} onToggle={toggle} />
 
-      <View style={[styles.tableRow, styles.tableHead]}>
+      <View style={[styles.row, styles.headRow]}>
         <Pressable
           onPress={() => setNewestFirst((v) => !v)}
           accessibilityRole="button"
@@ -79,34 +79,34 @@ export default function Dettaglio() {
   );
 
   return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
     <FlatList
-      style={styles.container}
-      contentContainerStyle={{
-        paddingTop: insets.top + spacing.lg,
-        paddingHorizontal: spacing.lg - 4,
-        paddingBottom: spacing.xl,
-      }}
+      contentContainerStyle={styles.content}
       data={rows}
       keyExtractor={(e) => String(e.id)}
       ListHeaderComponent={header}
       ListEmptyComponent={
-        <View style={[styles.tableRow, styles.emptyRow]}>
-          <Text style={styles.empty}>
-            {categoryIds.length === 0 && categories.length > 0
-              ? 'Nessuna categoria selezionata.'
-              : 'Nessuna spesa in questo periodo.'}
+        <View style={[styles.row, styles.lastRow, styles.emptyRow]}>
+          <Text style={styles.cell}>
+            {allExcluded ? 'Nessuna categoria selezionata.' : 'Nessuna spesa in questo periodo.'}
           </Text>
         </View>
       }
-      ListFooterComponent={<View style={styles.tableEnd} />}
-      renderItem={({ item }) => {
+      renderItem={({ item, index }) => {
         const cat = byId.get(item.category_id);
         return (
           <Pressable
             onPress={() => router.push({ pathname: '/aggiungi', params: { id: String(item.id) } })}
+            onLongPress={() => setNoteFor(item)}
+            accessibilityHint="Tieni premuto per leggere la nota"
             accessibilityRole="button"
             accessibilityLabel={`Modifica spesa ${cat?.nome ?? ''} ${formatEuro(item.importo)}`}
-            style={({ pressed }) => [styles.tableRow, styles.bodyRow, pressed && styles.pressed]}>
+            style={({ pressed }) => [
+              styles.row,
+              styles.bodyRow,
+              index === rows.length - 1 && styles.lastRow,
+              pressed && styles.pressed,
+            ]}>
             <Text style={[styles.cell, styles.colDate]}>{formatShortDate(item.data)}</Text>
             <View style={[styles.colCat, styles.catCell]}>
               <View style={[styles.dot, { backgroundColor: cat?.colore ?? colors.inactive }]} />
@@ -119,47 +119,51 @@ export default function Dettaglio() {
         );
       }}
     />
+    <NoteModal expense={noteFor} category={noteFor ? byId.get(noteFor.category_id) : undefined} onClose={() => setNoteFor(null)} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  subtitle: { fontFamily: fonts.body, fontSize: 16, color: colors.inkMuted },
-  title: { fontFamily: fonts.heading, fontSize: 36, color: colors.ink },
-  dot: { width: 14, height: 14, borderRadius: 7 },
-  tableRow: {
+  content: {
+    paddingTop: layout.screenTop,
+    paddingHorizontal: layout.screenPaddingX,
+    paddingBottom: layout.blockGap,
+  },
+  header: { gap: layout.blockGap, marginBottom: layout.blockGap },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.card,
-    paddingHorizontal: spacing.md + 4,
+    paddingHorizontal: 14,
   },
-  tableHead: {
-    marginTop: spacing.lg - 4,
-    minHeight: minTouchSize + 8,
-    borderTopLeftRadius: radii.card,
-    borderTopRightRadius: radii.card,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  tableEnd: {
-    height: spacing.sm,
-    backgroundColor: colors.card,
-    borderBottomLeftRadius: radii.card,
-    borderBottomRightRadius: radii.card,
+  headRow: {
+    // la tabella è una card unica: la testata arrotonda gli angoli in alto
+    marginBottom: -layout.blockGap,
+    paddingVertical: 10,
+    borderTopLeftRadius: radii.cardSm,
+    borderTopRightRadius: radii.cardSm,
   },
   bodyRow: {
-    minHeight: minTouchSize + 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    height: ROW_HEIGHT,
+    borderTopWidth: 1,
+    borderTopColor: colors.rowDivider,
   },
+  lastRow: { borderBottomLeftRadius: radii.cardSm, borderBottomRightRadius: radii.cardSm },
+  emptyRow: { height: ROW_HEIGHT * 2, justifyContent: 'center', borderTopWidth: 1, borderTopColor: colors.rowDivider },
   pressed: { opacity: 0.6 },
-  emptyRow: { minHeight: 96, justifyContent: 'center' },
-  empty: { fontFamily: fonts.body, fontSize: 16, color: colors.inkMuted },
-  colDate: { flex: 2, justifyContent: 'center', minHeight: minTouchSize },
-  colCat: { flex: 3 },
-  colAmount: { flex: 3, textAlign: 'right' },
-  catCell: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 4 },
-  headText: { fontFamily: fonts.bodySemiBold, fontSize: 15, color: colors.inkMuted },
-  cell: { fontFamily: fonts.body, fontSize: 17, color: colors.ink },
-  amount: { fontFamily: fonts.heading, fontSize: 17, color: colors.ink },
+  colDate: { width: 72 },
+  colCat: { flex: 1 },
+  colAmount: { width: 96, textAlign: 'right' },
+  catCell: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  headText: { fontFamily: fonts.bodySemiBold, fontSize: fontSizes.small, color: colors.inkMuted },
+  cell: { fontFamily: fonts.body, fontSize: fontSizes.body, color: colors.ink },
+  amount: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: fontSizes.body,
+    color: colors.ink,
+    fontVariant: ['tabular-nums'],
+  },
 });
